@@ -1,0 +1,10 @@
+[package]
+name = "tic_tac_toe"
+version = "0.1.0"
+authors = ["DataTriny <datatriny@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+crossterm = "0.9.6"
+rand = "0.7.0"
+textwrap = "0.11.0"
