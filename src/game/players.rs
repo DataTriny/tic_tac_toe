@@ -1,12 +1,29 @@
 use crate::{
     game::{
         artificial_intelligence::minimax,
-        board::{Board, PlayingPosition, Tile},
+        board::{Board, PlayingPosition},
     },
     input::Key,
     rendering::{Error, Renderer},
 };
 use rand::Rng;
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum Role {
+    O,
+    X,
+}
+
+impl Role {
+    /// Renders this role to the terminal.
+    pub fn render(&self, renderer: &Renderer) -> Result<(), Error> {
+        match self {
+            Role::O => renderer.write("o"),
+            Role::X => renderer.write("x"),
+        }
+        .map(|_| ())
+    }
+}
 
 /// Represents a player.
 #[derive(Clone)]
@@ -16,22 +33,22 @@ pub struct Player {
     /// The current count of wins for this player.
     pub score: usize,
     /// The kind of tile that this player will place on the board.
-    pub tile: Tile,
+    pub role: Role,
 }
 
 impl Player {
     /// Constructs a new player.
-    pub fn new(controller: Box<dyn PlayerController>, tile: Tile) -> Self {
+    pub fn new(controller: Box<dyn PlayerController>, role: Role) -> Self {
         Player {
             controller,
             score: 0,
-            tile,
+            role,
         }
     }
 
     /// Renders this player to the terminal.
     pub fn render(&self, renderer: &Renderer) -> Result<(), Error> {
-        self.tile.render(renderer)?;
+        self.role.render(renderer)?;
         renderer.write(": ")?;
         renderer.write(&self.score.to_string())?;
         Ok(())
@@ -44,7 +61,7 @@ pub enum PlayerAction {
     Move(PlayingPosition),
     /// Do nothing.
     None,
-    /// Places its tile on the given spot.
+    /// Places tile on the given spot.
     Play(PlayingPosition),
 }
 
@@ -131,6 +148,6 @@ impl PlayerController for UnbeatableComputerPlayerController {
     fn start_turn(&self, board: &Board) -> PlayerAction {
         let mut temp_board = board.clone();
         // Play the best available move.
-        PlayerAction::Play(minimax(&mut temp_board, Tile::X).pos)
+        PlayerAction::Play(minimax(&mut temp_board, Role::X).pos)
     }
 }

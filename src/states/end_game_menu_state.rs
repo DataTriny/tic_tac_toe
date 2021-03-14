@@ -1,7 +1,7 @@
 use crate::{
     game::{
-        board::{Board, Tile},
-        players::Player,
+        board::Board,
+        players::{Player, Role},
     },
     menus::{Menu, MenuEntry, MenuEntryId, MenuState},
     rendering::{Error, Renderer},
@@ -14,11 +14,11 @@ pub struct EndGameMenuState {
     menu: Menu,
     play_again_entry: MenuEntryId,
     players: Vec<Player>,
-    winner: Option<Tile>,
+    winner: Option<Role>,
 }
 
 impl EndGameMenuState {
-    pub fn new(board: Board, players: Vec<Player>, winner: Option<Tile>) -> Self {
+    pub fn new(board: Board, players: Vec<Player>, winner: Option<Role>) -> Self {
         let mut menu = Menu::new();
         let play_again_entry = menu.push(MenuEntry::new("Play again", 1));
         menu.push(MenuEntry::new("Quit", 2));
@@ -49,8 +49,8 @@ impl MenuState for EndGameMenuState {
     fn render_header(&self, renderer: &Renderer) -> Result<(), Error> {
         self.board.render(renderer)?;
         renderer.write("\n\n")?;
-        if let Some(ref tile) = self.winner {
-            tile.render(renderer)?;
+        if let Some(ref role) = self.winner {
+            role.render(renderer)?;
             renderer.write(" won!")?;
         } else {
             renderer.write("It's a draw!")?;
