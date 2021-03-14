@@ -1,7 +1,7 @@
 use crate::{
     game::{
-        board::{Board, GameResult, Tile},
-        players::{HumanPlayerController, Player, PlayerAction, PlayerController},
+        board::{Board, GameResult},
+        players::{HumanPlayerController, Player, PlayerAction, PlayerController, Role},
     },
     input::{InputEvent, InputMode, Key},
     rendering::{Error, Renderer},
@@ -20,8 +20,8 @@ impl PlayingState {
     /// Constructs a playing state with a default human player and an opponent which kind is determined by its controller.
     pub fn with_opponent(opponent_controller: Box<dyn PlayerController>) -> Self {
         PlayingState::with_players(vec![
-            Player::new(Box::new(HumanPlayerController {}), Tile::O),
-            Player::new(opponent_controller, Tile::X),
+            Player::new(Box::new(HumanPlayerController {}), Role::O),
+            Player::new(opponent_controller, Role::X),
         ])
     }
 
@@ -48,7 +48,7 @@ impl PlayingState {
                 self.board.playing_position = (x, y);
                 match self
                     .board
-                    .set(x, y, self.players[self.current_player].tile.clone())
+                    .set(x, y, self.players[self.current_player].role.clone())
                 {
                     GameResult::Draw => {
                         return StateTransition::Switch(Box::new(EndGameMenuState::new(
@@ -57,24 +57,24 @@ impl PlayingState {
                             None,
                         )))
                     }
-                    GameResult::Winner(tile, solution) => {
+                    GameResult::Winner(role, solution) => {
                         self.board.highlight_solution(solution);
                         return StateTransition::Switch(Box::new(EndGameMenuState::new(
                             self.board.clone(),
                             self.players
                                 .iter()
                                 .map(|p| {
-                                    if p.tile == tile {
+                                    if p.role == role {
                                         return Player {
                                             controller: p.controller.clone(),
                                             score: p.score + 1,
-                                            tile: tile.clone(),
+                                            role: role.clone(),
                                         };
                                     }
                                     p.clone()
                                 })
                                 .collect::<Vec<Player>>(),
-                            Some(tile),
+                            Some(role),
                         )));
                     }
                     _ => {
@@ -117,7 +117,7 @@ impl State for PlayingState {
         renderer.clear()?;
         self.board.render(renderer)?;
         renderer.write("\n\nIt's ")?;
-        self.players[self.current_player].tile.render(renderer)?;
+        self.players[self.current_player].role.render(renderer)?;
         renderer.write("'s turn.\n\nScores:\n")?;
         for p in self.players.iter() {
             p.render(renderer)?;

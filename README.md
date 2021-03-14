@@ -12,6 +12,7 @@ cargo run --release
 ## References
 - [How to make your Tic Tac Toe game unbeatable by using the minimax algorithm](https://www.freecodecamp.org/news/how-to-make-your-tic-tac-toe-game-unbeatable-by-using-the-minimax-algorithm-9d690bad4b37/),
 - The [amethyst game engine](https://amethyst.rs/) have been a source of inspiration while designing my state manager.
+- [TicTacToe and Magic Squares - C++ Forum](http://www.cpp.re/forum/general/270825/) for algorithm to determine winner.
 
 ## License
 This work is licensed under the MIT license.
